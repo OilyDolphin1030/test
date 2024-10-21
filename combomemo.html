@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ストリートファイター6コンボメモ</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>ストリートファイター6 コンボメモ</h1>
+    
+    <div id="character-select">
+        <label for="character-select">キャラクター選択: </label>
+        <select id="character-select" onchange="setCharacter(this.value)">
+            <option value="">キャラクターを選んでください</option>
+            <option value="リュウ">リュウ</option>
+            <option value="ケン">ケン</option>
+            <option value="チュンリー">チュンリー</option>
+            <option value="ガイル">ガイル</option>
+            <option value="ザンギエフ">ザンギエフ</option>
+            <option value="ダルシム">ダルシム</option>
+            <option value="エドモンド本田">エドモンド本田</option>
+            <option value="ブランカ">ブランカ</option>
+            <option value="バイソン">バイソン</option>
+            <option value="バルログ">バルログ</option>
+            <option value="サガット">サガット</option>
+            <option value="キャミィ">キャミィ</option>
+            <option value="ディージェイ">ディージェイ</option>
+            <option value="テリー">テリー</option>
+        </select>
+    </div>
+
+    <div id="combo-categories">
+        <label for="category-select">カテゴリ選択: </label>
+        <select id="category-select" onchange="setCategory(this.value)">
+            <option value="">カテゴリを選んでください</option>
+            <option value="仕掛ける場合">仕掛ける場合</option>
+            <option value="けん制・さし返す場合">けん制・さし返す場合</option>
+            <option value="確定反撃時">確定反撃時</option>
+            <option value="起き攻め系">起き攻め系</option>
+        </select>
+    </div>
+
+    <div id="input-buttons">
+        <div class="numpad">
+            <button class="numpad-button" onclick="addInput('7')">7</button>
+            <button class="numpad-button" onclick="addInput('8')">8</button>
+            <button class="numpad-button" onclick="addInput('9')">9</button>
+            <button class="numpad-button" onclick="addInput('4')">4</button>
+            <button class="numpad-button" onclick="addInput('＞')">＞</button>
+            <button class="numpad-button" onclick="addInput('6')">6</button>
+            <button class="numpad-button" onclick="addInput('1')">1</button>
+            <button class="numpad-button" onclick="addInput('2')">2</button>
+            <button class="numpad-button" onclick="addInput('3')">3</button>
+        </div>
+        <div class="attack-buttons">
+            <button class="weak-button" onclick="addInput('弱P')">弱P</button>
+            <button class="medium-button" onclick="addInput('中P')">中P</button>
+            <button class="strong-button" onclick="addInput('強P')">強P</button>
+            <button class="weak-button" onclick="addInput('弱K')">弱K</button>
+            <button class="medium-button" onclick="addInput('中K')">中K</button>
+            <button class="strong-button" onclick="addInput('強K')">強K</button>
+            <button class="special-button" onclick="addInput('DI')">DI</button>
+            <button class="special-button" onclick="addInput('DR')">DR</button>
+        </div>
+        <div class="control-buttons">
+            <button class="delete-button" onclick="removeLastInput()">最後の入力を消去</button>
+        </div>
+    </div>
+
+    <div id="current-combo">
+        <h2>現在のコンボ</h2>
+        <p id="combo-display">キャラクターとカテゴリを選んでください。</p>
+    </div>
+
+    <button class="save-button" onclick="saveCombo()">コンボを保存</button>
+    
+    <div id="saved-combos">
+        <h2>保存されたコンボ</h2>
+        <div id="combos-list-container"></div>
+    </div>
+</body>
+</html>
+
+<!-- script.js -->
+<script>
+    let currentCharacter = "";
+    let currentCategory = "";
+    let currentCombo = "";
+
+    function setCharacter(character) {
+        currentCharacter = character;
+        updateComboDisplay();
+    }
+
+    function setCategory(category) {
+        currentCategory = category;
+        updateComboDisplay();
+    }
+
+    function updateComboDisplay() {
+        if (currentCharacter === "" || currentCategory === "") {
+            document.getElementById('combo-display').innerText = "キャラクターとカテゴリを選んでください。";
+        } else {
+            document.getElementById('combo-display').innerText = `キャラクター: ${currentCharacter} \nカテゴリ: ${currentCategory} \nコンボ: ${currentCombo}`;
+        }
+    }
+
+    function addInput(input) {
+        if (currentCharacter === "" || currentCategory === "") {
+            alert("キャラクターとカテゴリを選んでください。");
+            return;
+        }
+        currentCombo += input + " ";
+        updateComboDisplay();
+    }
+
+    function removeLastInput() {
+        if (currentCombo === "") {
+            return;
+        }
+        let inputs = currentCombo.trim().split(" ");
+        inputs.pop();
+        currentCombo = inputs.join(" ") + " ";
+        updateComboDisplay();
+    }
+
+    function saveCombo() {
+        if (currentCharacter === "" || currentCategory === "" || currentCombo === "") {
+            alert("キャラクター、カテゴリ、コンボを入力してください。");
+            return;
+        }
+        let comboListId = `combos-list-${currentCharacter}-${currentCategory}`;
+        let comboList = document.getElementById(comboListId);
+        if (!comboList) {
+            const comboContainer = document.createElement('div');
+            comboContainer.id = `${currentCharacter}-${currentCategory}-combos`;
+            comboContainer.innerHTML = `<h3>${currentCharacter} - ${currentCategory}</h3><ul id="${comboListId}"></ul>`;
+            document.getElementById('combos-list-container').appendChild(comboContainer);
+            comboList = document.getElementById(comboListId);
+        }
+        const listItem = document.createElement('li');
+        listItem.textContent = `${currentCombo}`;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = "削除";
+        deleteButton.onclick = function() {
+            comboList.removeChild(listItem);
+        };
+        listItem.appendChild(deleteButton);
+        comboList.appendChild(listItem);
+        currentCombo = "";
+        updateComboDisplay();
+    }
+</script>
+
+<!-- styles.css -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: linear-gradient(to right, #e3f2fd, #bbdefb);
+        color: #0d47a1;
+    }
+    h1 {
+        text-align: center;
+        color: #1e88e5;
+    }
+    #character-select select, #combo-categories select, #input-buttons button {
+        margin: 5px;
+        padding: 8px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+    #character-select select, #combo-categories select {
+        background-color: #1976d2;
+    }
+    .numpad-button {
+        background-color: #64b5f6;
+    }
+    .weak-button {
+        background-color: #42a5f5;
+    }
+    .medium-button {
+        background-color: #ffb300;
+    }
+    .strong-button {
+        background-color: #e53935;
+    }
+    .special-button {
+        background-color: #ab47bc;
+    }
+    .delete-button {
+        background-color: #ef5350;
+        color: white;
+    }
+    .save-button {
+        background-color: #66bb6a;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .save-button:hover {
+        background-color: #43a047;
+    }
+    #input-buttons button:hover {
+        opacity: 0.9;
+    }
+    #current-combo {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #bbdefb;
+        border-radius: 5px;
+    }
+    #saved-combos {
+        margin-top: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #combos-list-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #combos-list-container > div {
+        margin-bottom: 20px;
+        background-color: #e3f2fd;
+        padding: 10px;
+        border-radius: 5px;
+        width: 100%;
+    }
+    .numpad {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5px;
+        margin-bottom: 10px;
+        max-width: 200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .attack-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    button {
+        transition: background-color 0.3s;
+    }
+    button:active {
+        background-color: #1565c0;
+    }
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+    li {
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    li button {
+        background-color: #ef5350;
+        padding: 5px;
+        font-size: 14px;
+    }
+    li button:hover {
+        background-color: #e53935;
+    }
+    @media (max-width: 768px) {
+        #input-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .numpad {
+            max-width: 150px;
+        }
+        .attack-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        .save-button {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
